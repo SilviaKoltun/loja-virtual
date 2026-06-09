@@ -3,17 +3,17 @@ const app = express()
 
 const PORT = process.env.PORT || 3000
 
-//app.get('/', (req, res) => {
-    //res.json({ mensagem: 'Servidor funcionando! 🎉' })
-  //})
+app.get('/', (req, res) => {
+    res.json({ mensagem: 'Servidor funcionando! 🎉' })
+  })
   
-  //app.get('/',(req, res) =>{
-    //res.json({
-      //  projeto: 'Loja Virtual',
-        //descricao: 'Site para vendas de produtos pela internet',
-        //status: 'online'
-      //})
-//})
+  app.get('/',(req, res) =>{
+    res.json({
+      projeto: 'Loja Virtual',
+        descricao: 'Site para vendas de produtos pela internet',
+        status: 'online'
+      })
+})
   app.get('/produtos', (req, res) => {
   res.json([
     { id: 1, nome: 'Notebook Gamer', preco: 4500.00, categoria: 'Informática' },
