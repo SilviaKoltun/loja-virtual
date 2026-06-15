@@ -42,6 +42,7 @@ app.post('/produtos', (req, res) => {
     id: produtos.length + 1,
     nome,
     preco,
+    categoria,
     estoque
   };
 
@@ -51,7 +52,8 @@ app.post('/produtos', (req, res) => {
 });
 
 app.post('mensagem', (req, res) =>{
-  const {categoria, estoque} = req, body;
+  const {categoria, estoque} = req.body;
+
   if (!categoria || !estoque){
     return res.status(400).json({
       erro: 'categoria e estoque são obrigatórios'
