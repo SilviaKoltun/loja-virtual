@@ -36,7 +36,7 @@ app.get('/produtos', (req, res) => {
 
 // POST - Adicionar um novo produto
 app.post('/produtos', (req, res) => {
-  const { nome, preco, estoque } = req.body;
+  const { nome, preco, categoria, estoque } = req.body;
 
   const novoProduto = {
     id: produtos.length + 1,
