@@ -22,7 +22,20 @@ app.get('/livros', (req, res) => {
   // Sem filtro, retorna todos
   res.json(livros)
 })
+app.get('/livros/:id', (req, res) => {
+  // Converter para número — req.params.id sempre chega como string
+  const id = Number(req.params.id)
 
+  // Procurar o livro com esse id no array
+  const livro = livros.find(l => l.id === id)
+
+  // Se não encontrou, responder com 404
+  if (!livro) {
+    return res.status(404).json({ erro: 'Livro não encontrado' })
+  }
+
+  res.json(livro)
+})
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
 })
