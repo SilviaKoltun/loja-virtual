@@ -3,7 +3,7 @@ const app = express()
 
 const PORT = process.env.PORT || 3000
 
-app.use(express.json());
+app.use(express.json())
 
 const produtos = [
   {
@@ -11,63 +11,74 @@ const produtos = [
     nome: 'Suporte para Celular 3D',
     preco: 25.90,
     categoria: 'acessorios',
-    estoque: 10
+    disponivel: true
   },
   {
     id: 2,
     nome: 'Organizador de Cabos 3D',
     preco: 15.50,
     categoria: 'organizadores',
-    estoque: 20
+    disponivel: true
   },
   {
     id: 3,
     nome: 'Vaso Decorativo 3D',
     preco: 39.90,
     categoria: 'decoração',
-    estoque: 5
+    disponivel: false
   }
-];
+]
 
 // GET - Listar todos os produtos
 app.get('/produtos', (req, res) => {
-  res.json(produtos);
-});
+  const { categoria, disponivel, busca } = req.query
+  let resultado = produtos
+  if (categoria) {
+    resultados = resultados.filter(produto => produto.categoria === categoria)
+  }
+  if (disponivel) {
+    const valorBooleano = disponivel === 'true'
+    resultado = resultado.filter(produto => produto.disponivel === valorBooleano)
+  }
+  if (busca) {
+    resultado = resultado.filter(produto => produto.nome.toLowerCase().includes(busca.toLowerCase()))
+    const termoBusca = busca.toLowerCase()
+    resultado = resultado.filter(produto => produto.nome.toLowerCase().includes(termoBusca))
+  }
+  res.json(resultado);
+})
 
-// POST - Adicionar um novo produto
+app.get('/produtos/:id', (req, res) => {
+  const id = Number(req.params.id)
+
+  const produto = produtos.find(produto => produto.id === id)
+
+  if (!produto) {
+    return res.status(404).json({ erro: 'Produto não encontrado' })
+  }
+ res.json(produto)
+})
 app.post('/produtos', (req, res) => {
-  const { nome, preco, categoria, estoque } = req.body;
+  const { nome, categoria, preco, disponivel } = req.body;
+
+  if (!nome || !categoria || !preco || disponivel === undefined) {
+    return res.status(400).json({
+      erro: 'nome, categoria, preco e disponivel são obrigatórios'
+    })
+  }
 
   const novoProduto = {
     id: produtos.length + 1,
     nome,
     preco,
     categoria,
-    estoque
+    disponivel
   };
 
   produtos.push(novoProduto);
 
   res.status(201).json(novoProduto);
 });
-
-app.post('mensagem', (req, res) =>{
-  const {categoria, estoque} = req.body;
-
-  if (!categoria || !estoque){
-    return res.status(400).json({
-      erro: 'categoria e estoque são obrigatórios'
-    })
-  }
-  const novaMensagem = {
-    id: mensagem.length +1,
-    categoria,
-    estoque
-  };
-  mensagem.push(novaMensagem);
-  res.status(201).json(novaMensagem)
-});
-
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
