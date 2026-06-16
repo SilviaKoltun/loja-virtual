@@ -5,6 +5,13 @@ const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 
+app.use((req, res, next) => {
+  const horario = new Date().toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo'})
+  console.log(`[${horario}] ${req.method} ${req.path}`)  
+  req.horario = horario 
+  next()
+})
+
 const produtos = [
   {
     id: 1,
@@ -125,19 +132,6 @@ app.delete('/produtos/:id', (req, res) => {
   produtos.splice(index, 1)
   res.status(204).send()
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 app.listen(PORT, () => {
