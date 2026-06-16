@@ -34,7 +34,7 @@ app.get('/produtos', (req, res) => {
   const { categoria, disponivel, busca } = req.query
   let resultado = produtos
   if (categoria) {
-    resultados = resultados.filter(produto => produto.categoria === categoria)
+    resultado = resultado.filter(produto => produto.categoria === categoria)
   }
   if (disponivel) {
     const valorBooleano = disponivel === 'true'
@@ -79,6 +79,66 @@ app.post('/produtos', (req, res) => {
 
   res.status(201).json(novoProduto);
 });
+
+//PUT
+
+app.put('/produtos/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const index = produtos.findIndex(produto => produto.id === id)
+
+  if (index === -1) {
+    return res.status(404).json({ erro: 'Produto não encontrado' })
+  }
+  const { nome, categoria, preco, disponivel } = req.body
+   
+  if (!nome || !categoria || !preco || disponivel === undefined) {
+    return res.status(400).json({
+      erro: 'nome, categoria, preco e disponivel são obrigatórios'
+    })
+  }
+  produtos[index] = { id, nome, categoria, preco, disponivel }
+  res.json(produtos[index])
+})
+
+// PATCH
+app.patch('/produtos/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const index = produtos.findIndex(produto => produto.id === id)
+  
+  if (index === -1) {
+    return res.status(404).json({ erro: 'Produto não encontrado' })
+  }
+  produtos[index] = { ...produtos[index], ...req.body, id }
+  res.json(produtos[index])
+})
+
+//DELETE
+
+app.delete('/produtos/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const index = produtos.findIndex(produto => produto.id === id)
+
+  if (index === -1) {
+    return res.status(404).json({ erro: 'Produto não encontrado' })
+  }
+
+  produtos.splice(index, 1)
+  res.status(204).send()
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
