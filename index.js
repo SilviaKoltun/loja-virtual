@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 
 const PORT = process.env.PORT || 3000
+// quando avançar no projeto, incluir o morgan para logar as requisições, encontro 06.
 
 app.use(express.json())
 
@@ -11,6 +12,12 @@ app.use((req, res, next) => {
   req.horario = horario 
   next()
 })
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    horario: req.horario
+   })  
+  })
 
 const produtos = [
   {
