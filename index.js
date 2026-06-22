@@ -1,7 +1,8 @@
 const express = require('express')
+const helmet = require('helmet')
 const app = express()
-
 const PORT = process.env.PORT || 3000
+
 // quando avançar no projeto, incluir o morgan para logar as requisições, encontro 06.
 
 app.use(express.json())
@@ -16,6 +17,9 @@ const produtosRoutes = require('./routes/produtos')
 
 app.use('/produtos', produtosRoutes)
 
+app.get('/', (req, res) => {
+  res.json({ projeto: 'Loja de produtos 3D', status: 'online' })
+})
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
