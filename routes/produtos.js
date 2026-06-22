@@ -28,7 +28,7 @@ const produtos = [
   ]
   // As rotas virão aqui nos próximos passos
   // GET - Listar todos os produtos
-router.get('/produtos', (req, res) => {
+router.get('/', (req, res) => {
     const { categoria, disponivel, busca } = req.query
     let resultado = produtos
     if (categoria) {

@@ -4,7 +4,7 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 // quando avançar no projeto, incluir o morgan para logar as requisições, encontro 06.
-
+app.use(helmet())
 app.use(express.json())
 
 app.use((req, res, next) => {
@@ -14,8 +14,10 @@ app.use((req, res, next) => {
   next()
 })
 const produtosRoutes = require('./routes/produtos')
+const categoriasRoutes = require('./routes/categorias')
 
 app.use('/produtos', produtosRoutes)
+app.use('/categorias', categoriasRoutes)
 
 app.get('/', (req, res) => {
   res.json({ projeto: 'Loja de produtos 3D', status: 'online' })
