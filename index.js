@@ -23,6 +23,18 @@ app.get('/', (req, res) => {
   res.json({ projeto: 'Loja de produtos 3D', status: 'online' })
 })
 
+// Middleware global de erros — deve ter 4 parâmetros exatamente
+app.use((err, req, res, next) => {
+  // Registra o erro no terminal para diagnóstico
+  console.error(`[ERRO] ${err.message}`)
+
+// Usa o status do erro se definido, ou 500 como padrão
+const status = err.status || 500
+const mensagem = err.message || 'Erro interno do servidor'
+
+res.status(status).json({ erro: mensagem })
+})
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
 })

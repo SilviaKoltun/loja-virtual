@@ -26,6 +26,10 @@ const produtos = [
       disponivel: false
     }
   ]
+  // Rota de teste — provoca erro proposital
+router.get('/erro-teste', (req, res) => {
+  throw new Error('Isso é um erro proposital!')
+})
   // As rotas virão aqui nos próximos passos
   // GET - Listar todos os produtos
 router.get('/', (req, res) => {
@@ -115,7 +119,7 @@ router.get('/', (req, res) => {
     produtos.splice(index, 1)
     res.status(204).send()
   })
-  
+
   
 
 module.exports = router
