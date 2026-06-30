@@ -38,6 +38,21 @@ const mensagem = err.message || 'Erro interno do servidor'
 res.status(status).json({ erro: mensagem })
 })
 
+app.get('/saude', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(), // segundos rodando
+    timestamp: new Date().toISOString()
+  })
+})
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'production') {
+    const horario = new Date().toLocaleTimeString('pt-BR')
+    console.log(`[${horario}] ${req.method} ${req.path}`)
+  }
+  next() // chamado sempre, com ou sem log
+})
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
 })
