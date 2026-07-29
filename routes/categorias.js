@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+//const prisma = require('../prisma/lib/prisma')
 
 const catgorias = [
     {id: 1, nome: 'Acessórios'},
@@ -7,14 +8,14 @@ const catgorias = [
     {id: 3, nome: 'Decoração'}
 ]
 //GET
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
     try {
-        res.json(catgorias)
+        res.json(categorias)
     } catch (err) {
         next(err)
     }
 })
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
     try {
     const id = Number(req.params.id)
     const categoria = catgorias.find(categoria => categoria.id === id)
@@ -30,7 +31,7 @@ router.get('/:id', (req, res, next) => {
 }
 })
 //POST
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
     try {
     const { nome } = req.body
 

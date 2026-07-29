@@ -11,9 +11,9 @@ app.use(helmet())
 app.use(express.json())
 
 app.use((req, res, next) => {
-  const horario = new Date().toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo'})
-  console.log(`[${horario}] ${req.method} ${req.path}`)  
-  req.horario = horario 
+  const horario = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+  console.log(`[${horario}] ${req.method} ${req.path}`)
+  req.horario = horario
   next()
 })
 const produtosRoutes = require('./routes/produtos')
@@ -31,11 +31,11 @@ app.use((err, req, res, next) => {
   // Registra o erro no terminal para diagnóstico
   console.error(`[ERRO] ${err.message}`)
 
-// Usa o status do erro se definido, ou 500 como padrão
-const status = err.status || 500
-const mensagem = err.message || 'Erro interno do servidor'
+  // Usa o status do erro se definido, ou 500 como padrão
+  const status = err.status || 500
+  const mensagem = err.message || 'Erro interno do servidor'
 
-res.status(status).json({ erro: mensagem })
+  res.status(status).json({ erro: mensagem })
 })
 
 app.get('/saude', (req, res) => {

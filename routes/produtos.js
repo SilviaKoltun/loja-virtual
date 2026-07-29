@@ -35,7 +35,7 @@ router.get('/', async (req, res, next) => {
   try {
     const { categoria, disponivel, busca } = req.query
 
-    const produtos = await prisma.produto.findMany();
+    let produtos = await prisma.produto.findMany();
     if (categoria) {
       resultado = resultado.filter(produto => produto.categoria === categoria)
     }
@@ -48,7 +48,7 @@ router.get('/', async (req, res, next) => {
       const termoBusca = busca.toLowerCase()
       resultado = resultado.filter(produto => produto.nome.toLowerCase().includes(termoBusca))
     }
-    res.json(produtos);
+    res.json(resultado);
   } catch (err) {
     next(err)
   }
@@ -164,7 +164,7 @@ router.patch('/:id', (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id)
-    const produtoEncontrado = await.prisma.produto.findUnique({
+    const produtoEncontrado = await prisma.produto.findUnique({
       where: { id }
     })
     if (!produtoEncontrado) {
