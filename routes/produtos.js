@@ -34,17 +34,16 @@ const produtos = [
 router.get('/', async (req, res, next) => {
   try {
     const { categoria, disponivel, busca } = req.query
-
-    let produtos = await prisma.produto.findMany();
+    let resultado = await prisma.produto.findMany();
+   
     if (categoria) {
-      resultado = resultado.filter(produto => produto.categoria === categoria)
+    resultado = resultado.filter(produto => produto.categoria === categoria)
     }
     if (disponivel) {
-      const valorBooleano = disponivel === 'true'
-      resultado = resultado.filter(produto => produto.disponivel === valorBooleano)
+    const valorBooleano = disponivel === 'true'
+    resultado = resultado.filter(produto => produto.disponivel === valorBooleano)
     }
     if (busca) {
-      resultado = resultado.filter(produto => produto.nome.toLowerCase().includes(busca.toLowerCase()))
       const termoBusca = busca.toLowerCase()
       resultado = resultado.filter(produto => produto.nome.toLowerCase().includes(termoBusca))
     }
@@ -79,7 +78,7 @@ router.post('/', async (req, res, next) => {
     const { nome, preco, disponivel } = req.body;
 
     if (!nome || !preco || disponivel === undefined) {
-      const erro = new Error('nome, categoria, preco e disponivel são obrigatórios')
+      const erro = new Error('nome, preco e disponivel são obrigatórios')
       erro.status = 400
       throw erro
     }
