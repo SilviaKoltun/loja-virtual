@@ -75,32 +75,20 @@ router.get('/:id', async (req, res, next) => {
 })
 router.post('/', async (req, res, next) => {
   try {
-    const { nome, preco, disponivel } = req.body;
-
-    if (!nome || !preco || disponivel === undefined) {
-      const erro = new Error('nome, preco e disponivel são obrigatórios')
-      erro.status = 400
-      throw erro
-    }
-
+   
     const novoProduto = await prisma.produto.create({
       data: {
-        nome,
-        preco,
         disponivel
-      },
-    });
+     },
+    })
 
+    await prisma.produtoCategorias.createMany({
+      data:categoriaIds.map(categoriaId => ({
+        produtoId: novoProduto .id,
+        categoriaIds: categoriaId
+      }))
+    })
 
-    //substituido pelo prisma create
-    // const novoProduto = { 
-    //id: produtos.length + 1,
-    //nome,
-    // preco,
-    //categoria,
-    //disponivel
-    //};
-    // produtos.push(novoProduto);
 
     res.status(201).json(novoProduto)
   } catch (err) {
@@ -132,7 +120,8 @@ router.put('/:id', async (req, res, next) => {
       data: {
         nome,
         preco,
-        disponivel
+        disponivel, 
+        categoria
       }
     })
 

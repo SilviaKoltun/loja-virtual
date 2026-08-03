@@ -8,6 +8,7 @@ datasource db {
 model Categoria {
   id       Int       @id @default(autoincrement())
   nome     String
+  produtos Produto[]
 }
 
 model Produto {
@@ -15,4 +16,41 @@ model Produto {
   nome        String
   preco       Float
   disponivel  Boolean   @default(true)
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId Int
 }
+
+//verificar se eh valido para cadastro, usuario, autenticação
+
+model User {
+  id          Int     @id @default(autoincrement())    
+  nome        String
+  email       String 
+  telefone    String
+  Senha       String
+
+}
+
+model Pedidos {
+  id          Int    @id @default(autoincrement())
+  usuarioId   String
+  status      String
+  pagamento Pagamento?
+
+}
+
+model Carrinho {
+  userId      Int   @id @default(autoincrement())
+  produtoId   Int
+}
+
+model Pagamento {
+  id          Int    @id @default(autoincrement())
+  FormaPagamento  Int
+  status  String
+  pedido Pedidos  @relation(fields: [pedidoId], references: [id]) 
+  pedidoId Int @unique
+}
+
+
+
