@@ -27,8 +27,7 @@ model User {
   nome        String
   email       String 
   telefone    String
-  Senha       String
-
+  senha       String
 }
 
 model Pedidos {

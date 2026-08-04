@@ -18,9 +18,11 @@ app.use((req, res, next) => {
 })
 const produtosRoutes = require('./routes/produtos')
 const categoriasRoutes = require('./routes/categorias')
+const authRoutes = require('./routes/auth')
 
 app.use('/produtos', produtosRoutes)
 app.use('/categorias', categoriasRoutes)
+app.use('/auth', authRoutes)
 
 app.get('/', (req, res) => {
   res.json({ projeto: 'Loja de produtos 3D', status: 'online' })
