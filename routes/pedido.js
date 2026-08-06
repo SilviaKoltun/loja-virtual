@@ -2,16 +2,18 @@ const express = require('express')
 const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
 
+const pedidos = []
 router.get('/', async (req, res, next) => {
     try {
 
-        const pagamentos = await prisma.pagamento.findMany({
+        const pedidos = await prisma.pedidos.findMany({
             include: {
-                pedido: true
+                user: true,
+                pagamento: true
             }
         });
 
-        res.json(pagamentos);
+        res.json(pedidos);
 
     } catch (err) {
         next(err);
@@ -22,20 +24,21 @@ router.get('/:id', async (req, res, next) => {
 
         const id = Number(req.params.id);
 
-        const pagamento = await prisma.pagamento.findUnique({
+        const pedido = await prisma.pedidos.findUnique({
             where: { id },
             include: {
-                pedido: true
+                user: true,
+                pagamento: true
             }
         });
 
-        if (!pagamento) {
+        if (!pedido) {
             return res.status(404).json({
-                erro: "Pagamento não encontrado."
+                erro: 'Pedido não encontrado.'
             });
         }
 
-        res.json(pagamento);
+        res.json(pedido);
 
     } catch (err) {
         next(err);
@@ -44,35 +47,34 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
     try {
 
-        const { formaPagamento, status, pedidoId } = req.body;
+        const { usuarioId, status } = req.body;
 
-        if (!formaPagamento || !status || !pedidoId) {
+        if (!usuarioId || !status) {
             return res.status(400).json({
-                erro: "Todos os campos são obrigatórios."
+                erro: 'Usuário e status são obrigatórios.'
             });
         }
 
-        const pedido = await prisma.pedidos.findUnique({
+        const usuario = await prisma.user.findUnique({
             where: {
-                id: pedidoId
+                id: usuarioId
             }
         });
 
-        if (!pedido) {
+        if (!usuario) {
             return res.status(404).json({
-                erro: "Pedido não encontrado."
+                erro: 'Usuário não encontrado.'
             });
         }
 
-        const pagamento = await prisma.pagamento.create({
+        const pedido = await prisma.pedidos.create({
             data: {
-                formaPagamento,
-                status,
-                pedidoId
+                usuarioId,
+                status
             }
         });
 
-        res.status(201).json(pagamento);
+        res.status(201).json(pedido);
 
     } catch (err) {
         next(err);
@@ -83,22 +85,21 @@ router.put('/:id', async (req, res, next) => {
 
         const id = Number(req.params.id);
 
-        const { formaPagamento, status } = req.body;
+        const { status } = req.body;
 
-        const pagamento = await prisma.pagamento.findUnique({
+        const pedido = await prisma.pedidos.findUnique({
             where: { id }
         });
 
-        if (!pagamento) {
+        if (!pedido) {
             return res.status(404).json({
-                erro: "Pagamento não encontrado."
+                erro: 'Pedido não encontrado.'
             });
         }
 
-        const atualizado = await prisma.pagamento.update({
+        const atualizado = await prisma.pedidos.update({
             where: { id },
             data: {
-                formaPagamento,
                 status
             }
         });
@@ -114,17 +115,17 @@ router.delete('/:id', async (req, res, next) => {
 
         const id = Number(req.params.id);
 
-        const pagamento = await prisma.pagamento.findUnique({
+        const pedido = await prisma.pedidos.findUnique({
             where: { id }
         });
 
-        if (!pagamento) {
+        if (!pedido) {
             return res.status(404).json({
-                erro: "Pagamento não encontrado."
+                erro: 'Pedido não encontrado.'
             });
         }
 
-        await prisma.pagamento.delete({
+        await prisma.pedidos.delete({
             where: { id }
         });
 
@@ -134,5 +135,8 @@ router.delete('/:id', async (req, res, next) => {
         next(err);
     }
 });
-//POST /pagamentos
-//GET /pagamentos /:id
+//GET /pedidos
+//GET /pedidos/:id 
+//POST /pedidos
+//PUT /pedidos /:id
+//DELETE /pediidos /:id

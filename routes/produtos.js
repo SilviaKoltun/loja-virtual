@@ -78,11 +78,14 @@ router.post('/', async (req, res, next) => {
    
     const novoProduto = await prisma.produto.create({
       data: {
-        disponivel
-     },
+        nome,
+        preco,
+        disponivel,
+        categoriaId
+     } 
     })
 
-    await prisma.produtoCategorias.createMany({
+    await prisma.categoriaId.createMany({
       data:categoriaIds.map(categoriaId => ({
         produtoId: novoProduto .id,
         categoriaIds: categoriaId
@@ -121,7 +124,7 @@ router.put('/:id', async (req, res, next) => {
         nome,
         preco,
         disponivel, 
-        categoria
+        categoriaId
       }
     })
 
@@ -136,8 +139,10 @@ router.put('/:id', async (req, res, next) => {
 router.patch('/:id', (req, res, next) => {
   try {
     const id = Number(req.params.id)
-    const index = produtos.findIndex(produto => produto.id === id)
-
+    await prisma.produto.update({
+    where:{id},
+    data:req.body
+});
     if (index === -1) {
       const erro = new Error('Produto não encontrado')
       erro.status = 404

@@ -1,6 +1,9 @@
 // routes/auth.js
+const prisma = require('../prisma/lib/prisma')
 const express = require('express')
-//const router = express.Router()
+const router = express.Router()
+const argon2 = require('argon2')
+
 //const db = require('../database')
 //const bcrypt = require('bcrypt')
 //const { validarObrigatorios, emailValido } = require('../helpers/validacao')
@@ -17,22 +20,32 @@ router.post('/cadastro', async (req, res, next) => {
     if (erros.length > 0) return res.status(400).json({ erros })
 
     // Verificar se email já está cadastrado
-    const existe = db.prepare('SELECT id FROM usuarios WHERE email = ?')
-      .get(email.toLowerCase().trim())
-    if (existe) return res.status(409).json({ erro: 'Email já cadastrado' })
+    const existe = await prisma.user.findUnique({
+      where: {
+        email: email.toLowerCase().trim()
+      }
+    })
+
+    if (existe) {return res.status(409).json({ erro: 'Email já cadastrado' })
+    }
+
 
     // Gerar o hash da senha (custo 10)
-    const senha_hash = await bcrypt.hash(senha, 10)
+    const senha_hash = await argon2.hash(senha)
 
     // Salvar o usuário — nunca retornar o senha_hash
-    const resultado = db.prepare(
-      'INSERT INTO usuarios (nome, email, senha_hash) VALUES (?, ?, ?)'
-    ).run(nome.trim(), email.toLowerCase().trim(), senha_hash)
+    const usuarioCriado = await prisma.user.create({
+      data: {
+        nome: nome.trim(),
+        email: email.toLowerCase().trim(),
+        senha_hash: senha_hash
+      }
+    })
 
     res.status(201).json({
-      id: resultado.lastInsertRowid,
-      nome: nome.trim(),
-      email: email.toLowerCase().trim()
+      id: usuarioCriado.id,
+      nome: usuarioCriado.nome,
+      email: usuarioCriado.email
     })
   } catch (err) { next(err) }
 })

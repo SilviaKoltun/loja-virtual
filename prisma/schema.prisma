@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
 model Categoria {
   id       Int       @id @default(autoincrement())
   nome     String
@@ -15,41 +16,56 @@ model Produto {
   id          Int       @id @default(autoincrement())
   nome        String
   preco       Float
+  estoque     Int
+  imagem      String
   disponivel  Boolean   @default(true)
-  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
   categoriaId Int
+  itensPedido ItemPedido[]
 }
 
 //verificar se eh valido para cadastro, usuario, autenticação
 
 model User {
-  id          Int     @id @default(autoincrement())    
-  nome        String
-  email       String 
-  telefone    String
-  senha       String
+  id       Int    @id @default(autoincrement())
+  nome     String
+  email    String @unique
+  telefone String
+  senha    String
+
+  pedidos Pedido[]
 }
 
-model Pedidos {
-  id          Int    @id @default(autoincrement())
-  usuarioId   String
-  status      String
+model Pedido {
+  id        Int        @id @default(autoincrement())
+  usuarioId Int
+  user      User       @relation(fields: [usuarioId], references: [id])
+  status    String
   pagamento Pagamento?
-
+  data      DateTime   @default(now())
+  itens     ItemPedido[]
 }
 
 model Carrinho {
-  userId      Int   @id @default(autoincrement())
-  produtoId   Int
+  userId    Int @id @default(autoincrement())
+  produtoId Int
 }
 
 model Pagamento {
-  id          Int    @id @default(autoincrement())
-  FormaPagamento  Int
-  status  String
-  pedido Pedidos  @relation(fields: [pedidoId], references: [id]) 
-  pedidoId Int @unique
+  id             Int     @id @default(autoincrement())
+  formaPagamento String
+  status         String
+  pedido         Pedido @relation(fields: [pedidoId], references: [id])
+  pedidoId       Int     @unique
 }
 
-
+model ItemPedido {
+  id         Int   @id @default(autoincrement())
+  pedidoId   Int
+  produtoId  Int
+  quantidade Int
+  preco      Float
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id])  
+  produto    Produto @relation(fields: [produtoId], references: [id])
+}
 

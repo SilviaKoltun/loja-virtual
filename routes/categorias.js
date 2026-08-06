@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
 
-const catgorias = [
+const categorias = [
     { id: 1, nome: 'Acessórios' },
     { id: 2, nome: 'Organizadores' },
     { id: 3, nome: 'Decoração' }
@@ -10,8 +10,7 @@ const catgorias = [
 //GET
 router.get('/', async (req, res, next) => {
     try {
-        const { id, nome } = req.query
-        let resultado = await prisma.categoria.findMany();
+        const resultado = await prisma.categoria.findMany();
         res.json(categorias);
     } catch (err) {
         next(err)
@@ -26,7 +25,7 @@ router.get('/:id', async (req, res, next) => {
         })
 
         if (!categoria) {
-            const erro = new Error('Categoria não encontrado')
+            const erro = new Error('Categoria não encontrada')
             erro.status = 404
             throw erro
         }
