@@ -1,6 +1,5 @@
 require('dotenv').config() //primeira linha
 
-
 const express = require('express')
 const helmet = require('helmet')
 const app = express()
@@ -32,7 +31,6 @@ app.use('/pagamentos', pagamentosRoutes)
 app.use('/pedidos', pedidosRoutes)
 app.use('/usuarios', usuariosRoutes)
 app.use('/carrinho', carrinhoRoutes)
-
 
 app.get('/', (req, res) => {
   res.json({ projeto: 'Loja de produtos 3D', status: 'online' })

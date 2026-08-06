@@ -2,8 +2,6 @@ const express = require('express')
 const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
 
-// Dados temporários (o array do seu recurso)
-// Cole aqui o array que estava no index.js
 const produtos = [
   {
     id: 1,

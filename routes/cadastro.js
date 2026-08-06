@@ -1,12 +1,7 @@
-// routes/auth.js
 const prisma = require('../prisma/lib/prisma')
 const express = require('express')
 const router = express.Router()
 const argon2 = require('argon2')
-
-//const db = require('../database')
-//const bcrypt = require('bcrypt')
-//const { validarObrigatorios, emailValido } = require('../helpers/validacao')
 
 // POST /auth/cadastro
 router.post('/cadastro', async (req, res, next) => {

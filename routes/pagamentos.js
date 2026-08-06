@@ -134,5 +134,3 @@ router.delete('/:id', async (req, res, next) => {
         next(err);
     }
 });
-//POST /pagamentos
-//GET /pagamentos /:id

@@ -118,8 +118,3 @@ router.delete('/:id', async (req, res, next) => {
 });
 
 
-//GET   /usuarios 
-//GET  /usuarios /: id
-//POST /usuarios
-//PUT   /usuarios/:id
-//DELETE  /usuarios/:id
