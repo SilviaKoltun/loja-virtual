@@ -83,12 +83,12 @@ router.post('/', async (req, res, next) => {
      } 
     })
 
-    await prisma.categoriaId.createMany({
-      data:categoriaIds.map(categoriaId => ({
-        produtoId: novoProduto .id,
-        categoriaIds: categoriaId
-      }))
-    })
+    //prisma.categoriaId.createMany({
+      //data:categoriaIds.map(categoriaId => ({
+        //produtoId: novoProduto .id,
+        //categoriaIds: categoriaId
+      //}))
+    //})
 
 
     res.status(201).json(novoProduto)
@@ -134,7 +134,7 @@ router.put('/:id', async (req, res, next) => {
   }
 })
 
-router.patch('/:id', (req, res, next) => {
+router.patch('/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id)
     await prisma.produto.update({

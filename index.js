@@ -3,6 +3,7 @@ require('dotenv').config() //primeira linha
 const express = require('express')
 const helmet = require('helmet')
 const app = express()
+const jwt = require("jsonwebtoken")
 const PORT = process.env.PORT || 3000
 
 // quando avançar no projeto, incluir o morgan para logar as requisições, encontro 06.
@@ -18,23 +19,43 @@ app.use((req, res, next) => {
 })
 const produtosRoutes = require('./routes/produtos')
 const categoriasRoutes = require('./routes/categorias')
-const authRoutes = require('./routes/auth')
 const pagamentosRoutes = require('./routes/pagamentos')
-const pedidosRoutes = require('./routes/pedidos')
+const pedidosRoutes = require('./routes/pedido')
 const usuariosRoutes = require('./routes/usuarios')
 const carrinhoRoutes = require('./routes/carrinho')
+const authRoutes = require('./routes/auth')
 
-app.use('/produtos', produtosRoutes)
-app.use('/categorias', categoriasRoutes)
 app.use('/auth', authRoutes)
-app.use('/pagamentos', pagamentosRoutes)
-app.use('/pedidos', pedidosRoutes)
-app.use('/usuarios', usuariosRoutes)
-app.use('/carrinho', carrinhoRoutes)
 
 app.get('/', (req, res) => {
   res.json({ projeto: 'Loja de produtos 3D', status: 'online' })
 })
+
+app.use((req, res, next) => {
+  const token = req.headers['authorization']
+    ?.replace('Bearer ', '')
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ erro: 'Token expirado' });
+      }
+      return res.status(403).json({ erro: 'Token inválido' });
+    }
+
+    req.usuario = decoded; // dados do usuário disponíveis nas próximas rotas
+    next();
+  });
+})
+
+
+
+app.use('/produtos', produtosRoutes)
+app.use('/categorias', categoriasRoutes)
+app.use('/pagamentos', pagamentosRoutes)
+app.use('/pedidos', pedidosRoutes)
+app.use('/usuarios', usuariosRoutes)
+app.use('/carrinho', carrinhoRoutes)
 
 // Middleware global de erros — deve ter 4 parâmetros exatamente
 app.use((err, req, res, next) => {
@@ -55,6 +76,7 @@ app.get('/saude', (req, res) => {
     timestamp: new Date().toISOString()
   })
 })
+
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
     const horario = new Date().toLocaleTimeString('pt-BR')
