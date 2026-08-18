@@ -3,12 +3,13 @@ require('dotenv').config() //primeira linha
 const express = require('express')
 const helmet = require('helmet')
 const app = express()
+const cors = require("cors")
 const jwt = require("jsonwebtoken")
 const PORT = process.env.PORT || 3000
 
 // quando avançar no projeto, incluir o morgan para logar as requisições, encontro 06.
-app.use(helmet())
 
+app.use(helmet())
 app.use(express.json())
 
 app.use((req, res, next) => {
@@ -24,6 +25,8 @@ const pedidosRoutes = require('./routes/pedido')
 const usuariosRoutes = require('./routes/usuarios')
 const carrinhoRoutes = require('./routes/carrinho')
 const authRoutes = require('./routes/auth')
+
+app.use(cors())
 
 app.use('/auth', authRoutes)
 
@@ -47,8 +50,6 @@ app.use((req, res, next) => {
     next();
   });
 })
-
-
 
 app.use('/produtos', produtosRoutes)
 app.use('/categorias', categoriasRoutes)

@@ -9,14 +9,14 @@ router.post('/login', async (req, res, next) => {
 
         const { email, senha } = req.body;
 
-        // Validação
+        
         if (!email || !senha) {
             return res.status(400).json({
                 erro: 'E-mail e senha são obrigatórios.'
             });
         }
 
-        // Procura usuário
+   
         const usuario = await prisma.user.findUnique({
             where: {
                 email: email.toLowerCase().trim()
@@ -29,7 +29,6 @@ router.post('/login', async (req, res, next) => {
             });
         }
 
-        // Verifica senha
         const senhaValida = await argon2.verify(
             usuario.senha,
             senha
@@ -41,7 +40,6 @@ router.post('/login', async (req, res, next) => {
             });
         }
 
-        // Gera token
         const token = jwt.sign(
             {
                 id: usuario.id,

@@ -5,6 +5,8 @@ const argon2 = require('argon2')
 const jwt = require("jsonwebtoken")
 
 router.post('/register', async (req, res, next) => {
+console.log(req)
+
     try {
         const { nome, email, telefone, senha } = req.body
 
