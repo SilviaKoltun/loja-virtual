@@ -73,7 +73,15 @@ router.get('/:id', async (req, res, next) => {
 })
 router.post('/', async (req, res, next) => {
   try {
-   
+    const { nome, preco, disponivel, categoriaId } = req.body
+
+    if (!nome || !preco || disponivel === undefined || !categoriaId) {
+      const erro = new Error('nome, preco, disponivel e categoriaId são obrigatórios')
+      erro.status = 400
+      throw erro
+    }
+  
+    
     const novoProduto = await prisma.produto.create({
       data: {
         nome,
