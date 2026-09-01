@@ -1,14 +1,22 @@
 const express = require('express')
 const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
-const { post } = require('./produtos')
 
 router.get('/', async (req, res, next) => {
     try {
+        const usuarioId = req.usuario?.id
+
         const carrinho = await prisma.carrinho.findMany({
-            data: {
+            where: usuarioId ? { usuarioId } : undefined,
+            include: {
                 produto: true,
-                usuario: true
+                usuario: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        email: true
+                    }
+                }
             }
         });
 
@@ -18,10 +26,11 @@ router.get('/', async (req, res, next) => {
         next(err);
     }
 });
+
 router.post('/', async (req, res, next) => {
     try {
-
-        const { usuarioId, produtoId, quantidade } = req.body;
+        const usuarioId = req.body.usuarioId || req.usuario?.id;
+        const { produtoId, quantidade } = req.body;
 
         if (!usuarioId || !produtoId) {
             return res.status(400).json({
@@ -29,11 +38,24 @@ router.post('/', async (req, res, next) => {
             });
         }
 
+        const produto = await prisma.produto.findUnique({
+            where: { id: Number(produtoId) }
+        });
+
+        if (!produto) {
+            return res.status(404).json({
+                erro: "Produto não encontrado."
+            });
+        }
+
         const novoItem = await prisma.carrinho.create({
             data: {
-                usuarioId,
-                produtoId,
-                quantidade: quantidade || 1
+                usuarioId: Number(usuarioId),
+                produtoId: Number(produtoId),
+                quantidade: quantidade ? Number(quantidade) : 1
+            },
+            include: {
+                produto: true
             }
         });
 
@@ -43,11 +65,17 @@ router.post('/', async (req, res, next) => {
         next(err);
     }
 });
+
 router.put('/:id', async (req, res, next) => {
     try {
-
         const id = Number(req.params.id);
         const { quantidade } = req.body;
+
+        if (!quantidade || Number(quantidade) < 1) {
+            return res.status(400).json({
+                erro: "Quantidade deve ser maior que zero."
+            });
+        }
 
         const item = await prisma.carrinho.findUnique({
             where: { id }
@@ -62,7 +90,10 @@ router.put('/:id', async (req, res, next) => {
         const atualizado = await prisma.carrinho.update({
             where: { id },
             data: {
-                quantidade
+                quantidade: Number(quantidade)
+            },
+            include: {
+                produto: true
             }
         });
 
@@ -72,10 +103,20 @@ router.put('/:id', async (req, res, next) => {
         next(err);
     }
 });
+
 router.delete('/:id', async (req, res, next) => {
     try {
-
         const id = Number(req.params.id);
+
+        const item = await prisma.carrinho.findUnique({
+            where: { id }
+        });
+
+        if (!item) {
+            return res.status(404).json({
+                erro: "Item não encontrado."
+            });
+        }
 
         await prisma.carrinho.delete({
             where: { id }
@@ -87,10 +128,14 @@ router.delete('/:id', async (req, res, next) => {
         next(err);
     }
 });
+
 router.delete('/', async (req, res, next) => {
     try {
+        const usuarioId = req.usuario?.id
 
-        await prisma.carrinho.deleteMany();
+        await prisma.carrinho.deleteMany({
+            where: usuarioId ? { usuarioId } : undefined
+        });
 
         res.json({
             mensagem: "Carrinho esvaziado."
@@ -100,4 +145,5 @@ router.delete('/', async (req, res, next) => {
         next(err);
     }
 });
+
 module.exports = router

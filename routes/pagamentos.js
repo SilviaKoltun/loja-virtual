@@ -52,7 +52,7 @@ router.post('/', async (req, res, next) => {
             });
         }
 
-        const pedido = await prisma.pedidos.findUnique({
+        const pedido = await prisma.pedido.findUnique({
             where: {
                 id: pedidoId
             }

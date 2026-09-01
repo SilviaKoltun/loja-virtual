@@ -2,16 +2,10 @@ const express = require('express')
 const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
 
-const categorias = [
-    { id: 1, nome: 'Acessórios' },
-    { id: 2, nome: 'Organizadores' },
-    { id: 3, nome: 'Decoração' }
-]
-//GET
 router.get('/', async (req, res, next) => {
     try {
         const resultado = await prisma.categoria.findMany();
-        res.json(categorias);
+        res.json(resultado);
     } catch (err) {
         next(err)
     }
@@ -35,9 +29,6 @@ router.get('/:id', async (req, res, next) => {
         next(err)
     }
 })
-
-
-//POST
 router.post('/', async (req, res, next) => {
     try {
         const { nome } = req.body;

@@ -13,14 +13,15 @@ model Categoria {
 }
 
 model Produto {
-  id          Int       @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   nome        String
-  descricao   String    @default("Produto fabricado com impressão 3D")
+  descricao   String       @default("Produto fabricado com impressão 3D")
   preco       Float
-  disponivel  Boolean   @default(true)
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  disponivel  Boolean      @default(true)
+  categoria   Categoria    @relation(fields: [categoriaId], references: [id])
   categoriaId Int
   itensPedido ItemPedido[]
+  carrinho    Carrinho[]
 }
 
 //verificar se eh valido para cadastro, usuario, autenticação
@@ -32,39 +33,43 @@ model User {
   telefone String
   senha    String
 
-  pedidos Pedido[]
+  pedidos  Pedido[]
+  carrinho Carrinho[]
 }
 
 model Pedido {
-  id        Int        @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   usuarioId Int
-  user      User       @relation(fields: [usuarioId], references: [id])
+  user      User         @relation(fields: [usuarioId], references: [id])
   status    String
   pagamento Pagamento?
-  data      DateTime   @default(now())
+  data      DateTime     @default(now())
   itens     ItemPedido[]
 }
 
 model Carrinho {
-  userId    Int @id @default(autoincrement())
-  produtoId Int
+  id         Int     @id @default(autoincrement())
+  usuarioId  Int
+  produtoId  Int
+  quantidade Int     @default(1)
+  usuario    User    @relation(fields: [usuarioId], references: [id])
+  produto    Produto @relation(fields: [produtoId], references: [id])
 }
 
 model Pagamento {
-  id             Int     @id @default(autoincrement())
+  id             Int    @id @default(autoincrement())
   formaPagamento String
   status         String
   pedido         Pedido @relation(fields: [pedidoId], references: [id])
-  pedidoId       Int     @unique
+  pedidoId       Int    @unique
 }
 
 model ItemPedido {
-  id         Int   @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   pedidoId   Int
   produtoId  Int
   quantidade Int
   preco      Float
-  pedido     Pedido  @relation(fields: [pedidoId], references: [id])  
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id])
   produto    Produto @relation(fields: [produtoId], references: [id])
 }
-

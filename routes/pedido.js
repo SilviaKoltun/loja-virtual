@@ -2,14 +2,18 @@ const express = require('express')
 const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
 
-const pedidos = []
 router.get('/', async (req, res, next) => {
     try {
 
-        const pedidos = await prisma.pedidos.findMany({
+        const pedidos = await prisma.pedido.findMany({
             include: {
                 user: true,
-                pagamento: true
+                pagamento: true,
+                itens: {
+                    include: {
+                        produto: true
+                    }
+                }
             }
         });
 
@@ -24,11 +28,16 @@ router.get('/:id', async (req, res, next) => {
 
         const id = Number(req.params.id);
 
-        const pedido = await prisma.pedidos.findUnique({
+        const pedido = await prisma.pedido.findUnique({
             where: { id },
             include: {
                 user: true,
-                pagamento: true
+                pagamento: true,
+                itens: {
+                    include: {
+                        produto: true
+                    }
+                }
             }
         });
 
@@ -67,7 +76,7 @@ router.post('/', async (req, res, next) => {
             });
         }
 
-        const pedido = await prisma.pedidos.create({
+        const pedido = await prisma.pedido.create({
             data: {
                 usuarioId,
                 status
@@ -87,7 +96,7 @@ router.put('/:id', async (req, res, next) => {
 
         const { status } = req.body;
 
-        const pedido = await prisma.pedidos.findUnique({
+        const pedido = await prisma.pedido.findUnique({
             where: { id }
         });
 
@@ -97,7 +106,7 @@ router.put('/:id', async (req, res, next) => {
             });
         }
 
-        const atualizado = await prisma.pedidos.update({
+        const atualizado = await prisma.pedido.update({
             where: { id },
             data: {
                 status
@@ -115,7 +124,7 @@ router.delete('/:id', async (req, res, next) => {
 
         const id = Number(req.params.id);
 
-        const pedido = await prisma.pedidos.findUnique({
+        const pedido = await prisma.pedido.findUnique({
             where: { id }
         });
 
@@ -125,7 +134,7 @@ router.delete('/:id', async (req, res, next) => {
             });
         }
 
-        await prisma.pedidos.delete({
+        await prisma.pedido.delete({
             where: { id }
         });
 
