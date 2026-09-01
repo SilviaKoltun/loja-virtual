@@ -15,9 +15,8 @@ model Categoria {
 model Produto {
   id          Int       @id @default(autoincrement())
   nome        String
+  descricao   String    @default("Produto fabricado com impressão 3D")
   preco       Float
-  estoque     Int
-  imagem      String
   disponivel  Boolean   @default(true)
   categoria   Categoria @relation(fields: [categoriaId], references: [id])
   categoriaId Int
