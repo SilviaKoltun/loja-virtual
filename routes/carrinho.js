@@ -27,7 +27,7 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-router.post('/', async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     try {
         const usuarioId = req.body.usuarioId || req.usuario?.id;
         const { produtoId, quantidade } = req.body;
@@ -39,7 +39,9 @@ router.post('/', async (req, res, next) => {
         }
 
         const produto = await prisma.produto.findUnique({
-            where: { id: Number(produtoId) }
+            where: {
+                id: Number(produtoId)
+            }
         });
 
         if (!produto) {
@@ -48,6 +50,8 @@ router.post('/', async (req, res, next) => {
             });
         }
 
+
+        // PROCURA SE O PRODUTO JÁ ESTÁ NO CARRINHO
         const existItem = await prisma.carrinho.findFirst({
             where: {
                 usuarioId: Number(usuarioId),
@@ -55,12 +59,21 @@ router.post('/', async (req, res, next) => {
             }
         });
 
+
+        // SE JÁ EXISTE, SOMA 1 NA QUANTIDADE
         if (existItem) {
+
             const atualizado = await prisma.carrinho.update({
-                where: { id: existItem.id },
-                data: {
-                    quantidade: existItem.quantidade + (quantidade ? Number(quantidade) : 1)
+                where: {
+                    id: existItem.id
                 },
+
+                data: {
+                    quantidade:
+                        existItem.quantidade +
+                        (quantidade ? Number(quantidade) : 1)
+                },
+
                 include: {
                     produto: true
                 }
@@ -69,12 +82,17 @@ router.post('/', async (req, res, next) => {
             return res.json(atualizado);
         }
 
+
+        // SE NÃO EXISTE, CRIA COM QUANTIDADE 1
         const novoItem = await prisma.carrinho.create({
             data: {
                 usuarioId: Number(usuarioId),
                 produtoId: Number(produtoId),
-                quantidade: quantidade ? Number(quantidade) : 1
+                quantidade: quantidade
+                    ? Number(quantidade)
+                    : 1
             },
+
             include: {
                 produto: true
             }
@@ -83,6 +101,9 @@ router.post('/', async (req, res, next) => {
         res.status(201).json(novoItem);
 
     } catch (err) {
+
+        console.error("Erro ao adicionar ao carrinho:", err);
+
         next(err);
     }
 });
