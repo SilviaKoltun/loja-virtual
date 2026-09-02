@@ -8,6 +8,7 @@ CREATE TABLE "Categoria" (
 CREATE TABLE "Produto" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "nome" TEXT NOT NULL,
+    "descricao" TEXT NOT NULL DEFAULT 'Produto fabricado com impressão 3D',
     "preco" REAL NOT NULL,
     "disponivel" BOOLEAN NOT NULL DEFAULT true,
     "categoriaId" INTEGER NOT NULL,
@@ -34,8 +35,12 @@ CREATE TABLE "Pedido" (
 
 -- CreateTable
 CREATE TABLE "Carrinho" (
-    "userId" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "produtoId" INTEGER NOT NULL
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "usuarioId" INTEGER NOT NULL,
+    "produtoId" INTEGER NOT NULL,
+    "quantidade" INTEGER NOT NULL DEFAULT 1,
+    CONSTRAINT "Carrinho_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Carrinho_produtoId_fkey" FOREIGN KEY ("produtoId") REFERENCES "Produto" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable

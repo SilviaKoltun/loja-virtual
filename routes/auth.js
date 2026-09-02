@@ -37,6 +37,8 @@ router.post('/register', async (req, res, next) => {
             telefone: usuarioCriado.telefone
         })
     } catch (err) {
+        console.log(err)
+
         if (err.code === 'P2002') {
             err.message = 'E-mail já cadastrado'
             err.status = 409

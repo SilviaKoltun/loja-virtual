@@ -48,6 +48,27 @@ router.post('/', async (req, res, next) => {
             });
         }
 
+        const existItem = await prisma.carrinho.findFirst({
+            where: {
+                usuarioId: Number(usuarioId),
+                produtoId: Number(produtoId)
+            }
+        });
+
+        if (existItem) {
+            const atualizado = await prisma.carrinho.update({
+                where: { id: existItem.id },
+                data: {
+                    quantidade: existItem.quantidade + (quantidade ? Number(quantidade) : 1)
+                },
+                include: {
+                    produto: true
+                }
+            });
+
+            return res.json(atualizado);
+        }
+
         const novoItem = await prisma.carrinho.create({
             data: {
                 usuarioId: Number(usuarioId),

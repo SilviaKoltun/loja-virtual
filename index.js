@@ -4,6 +4,8 @@ const express = require('express')
 const helmet = require('helmet')
 const app = express()
 const cors = require("cors")
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 const jwt = require("jsonwebtoken")
 const PORT = process.env.PORT || 3000
 const HOST = process.env.HOST || '127.0.0.1'
@@ -11,6 +13,11 @@ const HOST = process.env.HOST || '127.0.0.1'
 app.use(helmet())
 app.use(express.json())
 app.use(cors())
+
+app.post('/upload', upload.single('arquivo'), (req, res) => {
+  const {nome, descricao} = req.body
+  res.json({nome, descricao, arquivo: req.file})
+})
 
 app.use((req, res, next) => {
   const horario = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })

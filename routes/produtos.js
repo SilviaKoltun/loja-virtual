@@ -29,7 +29,12 @@ router.get('/', async (req, res, next) => {
     const produtos = await prisma.produto.findMany({
       where: filtros,
       include: {
-        categoria: true
+        categoria: true,
+        carrinho: {
+          where: {
+            usuarioId: req.usuarioId
+          }
+        }
       }
     })
 
