@@ -18,6 +18,7 @@ model Produto {
   descricao   String       @default("Produto fabricado com impressão 3D")
   preco       Float
   disponivel  Boolean      @default(true)
+  imagem      String?       
   categoria   Categoria    @relation(fields: [categoriaId], references: [id])
   categoriaId Int
   itensPedido ItemPedido[]

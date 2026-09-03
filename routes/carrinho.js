@@ -107,7 +107,47 @@ router.post("/", async (req, res, next) => {
         next(err);
     }
 });
+ 
+const atualizarQuantidade = async (id, novaQuantidade) => {
 
+  try {
+
+    const resposta = await fetch(
+      `http://localhost:3000/carrinho/${id}`,
+      {
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify({
+          quantidade: novaQuantidade
+        })
+      }
+    );
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      throw new Error(
+        dados.erro || "Erro ao atualizar quantidade."
+      );
+    }
+
+    buscarDadosCarrinho();
+
+  } catch (erro) {
+
+    console.error(
+      "Erro ao atualizar quantidade:",
+      erro
+    );
+
+    alert(erro.message);
+  }
+};
 router.put('/:id', async (req, res, next) => {
     try {
         const id = Number(req.params.id);

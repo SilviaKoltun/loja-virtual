@@ -96,7 +96,7 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id)
-    const { nome, descricao, preco, disponivel, categoriaId } = req.body
+    const { nome, descricao, preco, disponivel, imagem,categoriaId } = req.body
 
     const produto = await prisma.produto.findUnique({
       where: { id }
@@ -115,6 +115,7 @@ router.put('/:id', async (req, res, next) => {
         descricao,
         preco: preco === undefined ? undefined : Number(preco),
         disponivel,
+        imagem,
         categoriaId: categoriaId === undefined ? undefined : Number(categoriaId)
       }
     })

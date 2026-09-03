@@ -52,5 +52,28 @@ router.post('/', async (req, res, next) => {
         next(err)
     }
 });
+router.delete('/:id', async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
 
+        const categoria = await prisma.categoria.findUnique({
+            where: { id }
+        });
+
+        if (!categoria) {
+            const erro = new Error('Categoria não encontrada');
+            erro.status = 404;
+            throw erro;
+        }
+
+        await prisma.categoria.delete({
+            where: { id }
+        });
+
+        res.status(204).send();
+
+    } catch (err) {
+        next(err);
+    }
+});
 module.exports = router
