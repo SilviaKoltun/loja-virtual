@@ -30,11 +30,6 @@ router.get('/', async (req, res, next) => {
       where: filtros,
       include: {
         categoria: true,
-        carrinho: {
-          where: {
-            usuarioId: req.usuarioId
-          }
-        }
       }
     })
 
@@ -69,7 +64,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const { nome, descricao, preco, disponivel = true, categoriaId } = req.body
+    const { nome, descricao, preco, disponivel = true, imagem, categoriaId } = req.body
 
     if (!nome || preco === undefined || categoriaId === undefined) {
       const erro = new Error('nome, preco e categoriaId são obrigatórios')
@@ -83,6 +78,7 @@ router.post('/', async (req, res, next) => {
         descricao,
         preco: Number(preco),
         disponivel,
+        imagem,
         categoriaId: Number(categoriaId)
       }
     })

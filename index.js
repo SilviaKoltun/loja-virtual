@@ -14,6 +14,8 @@ app.use(helmet())
 app.use(express.json())
 app.use(cors())
 
+app.use("/uploads", express.static("uploads"))
+
 app.post('/upload', upload.single('arquivo'), (req, res) => {
   const {nome, descricao} = req.body
   res.json({nome, descricao, arquivo: req.file})
@@ -50,33 +52,45 @@ app.get('/saude', (req, res) => {
   })
 })
 
-app.use((req, res, next) => {
-  const token = req.headers['authorization']
-    ?.replace('Bearer ', '')
+const autenticar = (req, res, next) => {
+  const token = req.headers.authorization
+    ?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(401).json({ erro: 'Token não informado' })
+    return res.status(401).json({
+      erro: "Token não informado"
+    });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ erro: 'Token expirado' })
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    (err, decoded) => {
+      if (err) {
+        if (err.name === "TokenExpiredError") {
+          return res.status(401).json({
+            erro: "Token expirado"
+          });
+        }
+
+        return res.status(403).json({
+          erro: "Token inválido"
+        });
       }
-      return res.status(403).json({ erro: 'Token inválido' })
+
+      req.usuario = decoded;
+      next();
     }
+  );
+};
 
-    req.usuario = decoded
-    next()
-  })
-})
+app.use("/produtos", produtosRoutes);
+app.use("/categorias", categoriasRoutes);
 
-app.use('/produtos', produtosRoutes)
-app.use('/categorias', categoriasRoutes)
-app.use('/pagamentos', pagamentosRoutes)
-app.use('/pedidos', pedidosRoutes)
-app.use('/usuarios', usuariosRoutes)
-app.use('/carrinho', carrinhoRoutes)
+app.use("/carrinho", autenticar, carrinhoRoutes);
+app.use("/pedidos", autenticar, pedidosRoutes);
+app.use("/pagamentos", autenticar, pagamentosRoutes);
+app.use("/usuarios", autenticar, usuariosRoutes);
 
 // Middleware global de erros — deve ter 4 parâmetros exatamente
 app.use((err, req, res, next) => {

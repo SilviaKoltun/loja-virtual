@@ -6,8 +6,10 @@ router.get('/', async (req, res, next) => {
     try {
 
         const pedidos = await prisma.pedido.findMany({
+            where: {
+                usuarioId: req.usuario.id
+            },
             include: {
-                user: true,
                 pagamento: true,
                 itens: {
                     include: {
@@ -41,6 +43,12 @@ router.get('/:id', async (req, res, next) => {
             }
         });
 
+        if (pedido.usuarioId !== req.usuario.id) {
+        return res.status(403).json({
+        erro: 'Você não tem permissão para acessar este pedido.'
+    })
+    }
+
         if (!pedido) {
             return res.status(404).json({
                 erro: 'Pedido não encontrado.'
@@ -55,40 +63,68 @@ router.get('/:id', async (req, res, next) => {
 });
 router.post('/', async (req, res, next) => {
     try {
+        const usuarioId = req.usuario.id
 
-        const { usuarioId, status } = req.body;
-
-        if (!usuarioId || !status) {
-            return res.status(400).json({
-                erro: 'Usuário e status são obrigatórios.'
-            });
-        }
-
-        const usuario = await prisma.user.findUnique({
+        const itensCarrinho = await prisma.carrinho.findMany({
             where: {
-                id: usuarioId
+                usuarioId
+            },
+            include: {
+                produto: true
             }
-        });
+        })
 
-        if (!usuario) {
-            return res.status(404).json({
-                erro: 'Usuário não encontrado.'
-            });
+        if (itensCarrinho.length === 0) {
+            return res.status(400).json({
+                erro: 'Carrinho vazio.'
+            })
         }
 
-        const pedido = await prisma.pedido.create({
-            data: {
-                usuarioId,
-                status
-            }
-        });
+        const pedido = await prisma.$transaction(async (tx) => {
 
-        res.status(201).json(pedido);
+            const novoPedido = await tx.pedido.create({
+                data: {
+                    usuarioId,
+                    status: 'aguardando_pagamento'
+                }
+            })
+
+            await tx.itemPedido.createMany({
+                data: itensCarrinho.map((item) => ({
+                    pedidoId: novoPedido.id,
+                    produtoId: item.produtoId,
+                    quantidade: item.quantidade,
+                    preco: item.produto.preco
+                }))
+            })
+
+            await tx.carrinho.deleteMany({
+                where: {
+                    usuarioId
+                }
+            })
+
+            return tx.pedido.findUnique({
+                where: {
+                    id: novoPedido.id
+                },
+                include: {
+                    itens: {
+                        include: {
+                            produto: true
+                        }
+                    },
+                    pagamento: true
+                }
+            })
+        })
+
+        res.status(201).json(pedido)
 
     } catch (err) {
-        next(err);
+        next(err)
     }
-});
+})
 router.put('/:id', async (req, res, next) => {
     try {
 
@@ -105,6 +141,11 @@ router.put('/:id', async (req, res, next) => {
                 erro: 'Pedido não encontrado.'
             });
         }
+        if (pedido.usuarioId !== req.usuario.id) {
+        return res.status(403).json({
+        erro: 'Você não tem permissão para acessar este pedido.'
+    })
+}
 
         const atualizado = await prisma.pedido.update({
             where: { id },
@@ -133,6 +174,11 @@ router.delete('/:id', async (req, res, next) => {
                 erro: 'Pedido não encontrado.'
             });
         }
+        if (pedido.usuarioId !== req.usuario.id) {
+        return res.status(403).json({
+        erro: 'Você não tem permissão para excluir este pedido.'
+    })
+}
 
         await prisma.pedido.delete({
             where: { id }

@@ -55,6 +55,7 @@ model Carrinho {
   quantidade Int     @default(1)
   usuario    User    @relation(fields: [usuarioId], references: [id])
   produto    Produto @relation(fields: [produtoId], references: [id])
+   @@unique([usuarioId, produtoId])
 }
 
 model Pagamento {
