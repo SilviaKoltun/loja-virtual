@@ -28,11 +28,12 @@ model Produto {
 //verificar se eh valido para cadastro, usuario, autenticação
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   nome     String
-  email    String @unique
-  telefone String
-  senha    String
+  email    String  @unique
+  telefone String?
+  senha    String?
+  googleId String? @unique
 
   pedidos  Pedido[]
   carrinho Carrinho[]
@@ -55,7 +56,7 @@ model Carrinho {
   quantidade Int     @default(1)
   usuario    User    @relation(fields: [usuarioId], references: [id])
   produto    Produto @relation(fields: [produtoId], references: [id])
-   @@unique([usuarioId, produtoId])
+  @@unique([usuarioId, produtoId])
 }
 
 model Pagamento {

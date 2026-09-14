@@ -16,6 +16,7 @@ app.use(cors())
 
 app.use("/uploads", express.static("uploads"))
 
+
 app.post('/upload', upload.single('arquivo'), (req, res) => {
   const {nome, descricao} = req.body
   res.json({nome, descricao, arquivo: req.file})
@@ -92,7 +93,7 @@ app.use("/pedidos", autenticar, pedidosRoutes);
 app.use("/pagamentos", autenticar, pagamentosRoutes);
 app.use("/usuarios", autenticar, usuariosRoutes);
 
-// Middleware global de erros — deve ter 4 parâmetros exatamente
+
 app.use((err, req, res, next) => {
   console.error(`[ERRO] ${err.message}`)
 

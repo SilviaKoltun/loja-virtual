@@ -3,6 +3,10 @@ const router = express.Router()
 const prisma = require('../prisma/lib/prisma')
 const argon2 = require('argon2')
 const jwt = require("jsonwebtoken")
+const { OAuth2Client } = require('google-auth-library')
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+console.log("CLIENT ID DO BACKEND:", process.env.GOOGLE_CLIENT_ID)
 
 router.post('/register', async (req, res, next) => {
     try {
@@ -65,12 +69,23 @@ router.post('/login', async (req, res, next) => {
         })
 
         if (!usuarioEncontrado) {
-            const erro = new Error("Usuário não encontrado")
+            const erro = new Error('Usuário não encontrado')
             erro.status = 404
             throw erro
         }
 
-        const senhaValida = await argon2.verify(usuarioEncontrado.senha, senha)
+        // Primeiro verificamos se a conta possui senha
+        if (!usuarioEncontrado.senha) {
+            const erro = new Error('Esta conta utiliza login com Google')
+            erro.status = 401
+            throw erro
+        }
+
+        // Só depois verificamos a senha
+        const senhaValida = await argon2.verify(
+            usuarioEncontrado.senha,
+            senha
+        )
 
         if (!senhaValida) {
             const erro = new Error('Senha inválida')
@@ -79,9 +94,14 @@ router.post('/login', async (req, res, next) => {
         }
 
         const token = jwt.sign(
-            { id: usuarioEncontrado.id, email: usuarioEncontrado.email },
+            {
+                id: usuarioEncontrado.id,
+                email: usuarioEncontrado.email
+            },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+            {
+                expiresIn: process.env.JWT_EXPIRES_IN || '1h'
+            }
         )
 
         res.json({
@@ -93,6 +113,96 @@ router.post('/login', async (req, res, next) => {
                 telefone: usuarioEncontrado.telefone
             }
         })
+
+    } catch (error) {
+        next(error)
+    }
+})
+router.post('/google', async (req, res, next) => {
+    try {
+        const { credential } = req.body
+
+        if (!credential) {
+            const erro = new Error('Credencial do Google é obrigatória')
+            erro.status = 400
+            throw erro
+        }
+
+        // Verifica o token recebido do Google
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        })
+
+        const payload = ticket.getPayload()
+
+        const googleId = payload.sub
+        const nome = payload.name
+        const email = payload.email.toLowerCase().trim()
+
+        // Procura usuário pelo googleId
+        let usuario = await prisma.user.findUnique({
+            where: {
+                googleId
+            }
+        })
+
+        // Se não encontrou pelo googleId,
+        // procura pelo e-mail
+        if (!usuario) {
+            usuario = await prisma.user.findUnique({
+                where: {
+                    email
+                }
+            })
+        }
+
+        // Se usuário ainda não existe, cria
+        if (!usuario) {
+            usuario = await prisma.user.create({
+                data: {
+                    nome,
+                    email,
+                    googleId
+                }
+            })
+        }
+
+        // Se usuário já existe com esse e-mail,
+        // mas ainda não tem googleId, vincula a conta Google
+        if (!usuario.googleId) {
+            usuario = await prisma.user.update({
+                where: {
+                    id: usuario.id
+                },
+                data: {
+                    googleId
+                }
+            })
+        }
+
+        // Gera o JWT da sua própria aplicação
+        const token = jwt.sign(
+            {
+                id: usuario.id,
+                email: usuario.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: process.env.JWT_EXPIRES_IN || '1h'
+            }
+        )
+
+        res.status(200).json({
+            token,
+            usuario: {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.email,
+                telefone: usuario.telefone
+            }
+        })
+
     } catch (error) {
         next(error)
     }
