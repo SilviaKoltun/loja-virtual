@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const axios = require('axios')
 const prisma = require('../prisma/lib/prisma')
 
 
@@ -22,6 +23,34 @@ router.get('/', async (req, res, next) => {
         next(err)
     }
 })
+router.get('/endereco/:cep', async (req, res, next) => {
+  try {
+    const cep = req.params.cep;
+
+    const cepLimpo = cep.replace(/\D/g, '');
+
+    if (cepLimpo.length !== 8) {
+      return res.status(400).json({
+        erro: 'CEP inválido. Deve conter 8 dígitos.'
+      });
+    }
+
+    const response = await axios.get(
+      `https://viacep.com.br/ws/${cepLimpo}/json/`
+    );
+
+    if (response.data.erro) {
+      return res.status(404).json({
+        erro: 'CEP não encontrado.'
+      });
+    }
+
+    return res.json(response.data);
+
+  } catch (error) {
+    next(error);
+  }
+});
 
 
 router.post('/', async (req, res, next) => {

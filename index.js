@@ -36,6 +36,7 @@ const categoriasRoutes = require('./routes/categorias')
 const pagamentosRoutes = require('./routes/pagamentos')
 const pedidosRoutes = require('./routes/pedido')
 const usuariosRoutes = require('./routes/usuarios')
+
 const carrinhoRoutes = require('./routes/carrinho')
 const authRoutes = require('./routes/auth')
 
