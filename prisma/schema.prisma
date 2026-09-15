@@ -44,10 +44,19 @@ model Pedido {
   usuarioId Int
   user      User         @relation(fields: [usuarioId], references: [id])
   status    String
-  pagamento Pagamento?
   data      DateTime     @default(now())
+
+  cep       String?
+  rua       String?
+  bairro    String?
+  cidade    String?
+  uf        String?
+  frete     Float        @default(0)
+
   itens     ItemPedido[]
+  pagamento Pagamento?
 }
+
 
 model Carrinho {
   id         Int     @id @default(autoincrement())

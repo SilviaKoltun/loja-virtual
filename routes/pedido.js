@@ -43,17 +43,19 @@ router.get('/:id', async (req, res, next) => {
             }
         });
 
+         if (!pedido) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.'
+            });
+        }
+        
         if (pedido.usuarioId !== req.usuario.id) {
         return res.status(403).json({
         erro: 'Você não tem permissão para acessar este pedido.'
     })
     }
 
-        if (!pedido) {
-            return res.status(404).json({
-                erro: 'Pedido não encontrado.'
-            });
-        }
+    
 
         res.json(pedido);
 
@@ -64,6 +66,15 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
     try {
         const usuarioId = req.usuario.id
+            
+        const {
+        cep,
+        rua,
+        bairro,
+        cidade,
+        uf,
+        frete
+        } = req.body
 
         const itensCarrinho = await prisma.carrinho.findMany({
             where: {
@@ -83,10 +94,16 @@ router.post('/', async (req, res, next) => {
         const pedido = await prisma.$transaction(async (tx) => {
 
             const novoPedido = await tx.pedido.create({
-                data: {
-                    usuarioId,
-                    status: 'aguardando_pagamento'
-                }
+            data: {
+            usuarioId,
+            status: 'aguardando_pagamento',
+            cep,
+            rua,
+            bairro,
+            cidade,
+            uf,
+            frete: Number(frete) || 0
+            }
             })
 
             await tx.itemPedido.createMany({
