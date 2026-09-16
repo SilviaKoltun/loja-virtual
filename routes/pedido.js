@@ -112,12 +112,6 @@ router.post('/', async (req, res, next) => {
                 }))
             })
 
-            await tx.carrinho.deleteMany({
-                where: {
-                    usuarioId
-                }
-            })
-
             return tx.pedido.findUnique({
                 where: {
                     id: novoPedido.id

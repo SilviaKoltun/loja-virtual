@@ -109,26 +109,30 @@ router.post('/', async (req, res, next) => {
 
         const resultado = await prisma.$transaction(async (tx) => {
 
-            const pagamento = await tx.pagamento.create({
-                data: {
-                    formaPagamento,
-                    status: 'aprovado',
-                    pedidoId: idPedido
-                }
-            })
-
-            await tx.pedido.update({
-                where: {
-                    id: idPedido
-                },
-                data: {
-                    status: 'pago'
-                }
-            })
-
-            return pagamento
+        const pagamento = await tx.pagamento.create({
+        data: {
+            formaPagamento,
+            status: 'aprovado',
+            pedidoId: idPedido
+            }
         })
 
+        await tx.pedido.update({
+        where: {
+            id: idPedido
+        },
+        data: {
+            status: 'pago'
+        }
+    })
+         await tx.carrinho.deleteMany({
+        where: {
+            usuarioId
+        }
+    })
+      
+        return pagamento
+    })
         res.status(201).json(resultado)
 
     } catch (err) {
