@@ -34,7 +34,6 @@ router.get('/', async (req, res, next) => {
     }
 })
 
-
 router.get('/:id', async (req, res, next) => {
     try {
 
@@ -74,7 +73,6 @@ router.get('/:id', async (req, res, next) => {
         next(err)
     }
 })
-
 
 router.put('/:id', async (req, res, next) => {
     try {
@@ -146,7 +144,6 @@ router.put('/:id', async (req, res, next) => {
     }
 })
 
-
 router.delete('/:id', async (req, res, next) => {
     try {
 
@@ -184,6 +181,5 @@ router.delete('/:id', async (req, res, next) => {
         next(err)
     }
 })
-
 
 module.exports = router

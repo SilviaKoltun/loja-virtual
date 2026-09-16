@@ -54,9 +54,6 @@ router.get('/:id', async (req, res, next) => {
         erro: 'Você não tem permissão para acessar este pedido.'
     })
     }
-
-    
-
         res.json(pedido);
 
     } catch (err) {

@@ -94,7 +94,6 @@ router.post('/', async (req, res, next) => {
             })
         }
 
-        // PROCURA SE O PRODUTO JÁ ESTÁ NO CARRINHO
         const existItem = await prisma.carrinho.findFirst({
             where: {
                 usuarioId,
@@ -102,7 +101,6 @@ router.post('/', async (req, res, next) => {
             }
         })
 
-        // SE JÁ EXISTE, SOMA A QUANTIDADE
         if (existItem) {
             const atualizado = await prisma.carrinho.update({
                 where: {
@@ -120,7 +118,6 @@ router.post('/', async (req, res, next) => {
             return res.json(atualizado)
         }
 
-        // SE NÃO EXISTE, CRIA
         const novoItem = await prisma.carrinho.create({
             data: {
                 usuarioId,
@@ -138,7 +135,6 @@ router.post('/', async (req, res, next) => {
         next(err)
     }
 })
-
 
 router.put('/:id', async (req, res, next) => {
     try {
@@ -189,7 +185,6 @@ router.put('/:id', async (req, res, next) => {
     }
 })
 
-
 router.delete('/:id', async (req, res, next) => {
     try {
         const id = Number(req.params.id)
@@ -220,7 +215,6 @@ router.delete('/:id', async (req, res, next) => {
         next(err)
     }
 })
-
 
 router.delete('/', async (req, res, next) => {
     try {

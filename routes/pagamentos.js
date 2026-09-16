@@ -25,7 +25,6 @@ router.get('/', async (req, res, next) => {
     }
 })
 
-
 router.get('/:id', async (req, res, next) => {
     try {
         const id = Number(req.params.id)
@@ -61,7 +60,6 @@ router.get('/:id', async (req, res, next) => {
         next(err)
     }
 })
-
 
 router.post('/', async (req, res, next) => {
     try {
@@ -138,7 +136,6 @@ router.post('/', async (req, res, next) => {
     }
 })
 
-
 router.put('/:id', async (req, res, next) => {
     try {
         const id = Number(req.params.id)
@@ -183,7 +180,6 @@ router.put('/:id', async (req, res, next) => {
         next(err)
     }
 })
-
 
 router.delete('/:id', async (req, res, next) => {
     try {
