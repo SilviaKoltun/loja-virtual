@@ -67,6 +67,8 @@ router.post('/', async (req, res, next) => {
         const {
         cep,
         rua,
+        numero,
+        complemento,
         bairro,
         cidade,
         uf,
@@ -96,6 +98,8 @@ router.post('/', async (req, res, next) => {
             status: 'aguardando_pagamento',
             cep,
             rua,
+            numero,
+            complemento,
             bairro,
             cidade,
             uf,
